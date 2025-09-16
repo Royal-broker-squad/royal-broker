@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Validação de Email</title>
+  <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .teste-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .teste-item {
+      margin: 10px 0;
+      padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .teste-valido {
+            border-color: #39d98a;
+            background-color: #f0fff4;
+        }
+        .teste-invalido {
+            border-color: #ff6b6b;
+            background-color: #fff5f5;
+        }
+        .email-teste {
+            font-weight: bold;
+            color: #333;
+        }
+        .resultado {
+            margin-top: 5px;
+            font-size: 14px;
+        }
+        .resultado-valido {
+      color: #39d98a;
+    }
+        .resultado-invalido {
+      color: #ff6b6b;
+    }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .descricao {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+    }
+  </style>
+</head>
+<body>
+    <h1>🧪 Teste de Validação de Email</h1>
+    <p class="descricao">Testando se a validação rejeita emails inválidos como "mm", "bbb", "kadujbsb"</p>
+    
+    <div class="teste-container">
+        <h3>Emails Válidos (devem passar na validação)</h3>
+        <div id="emails-validos"></div>
+      </div>
+      
+         <div class="teste-container">
+         <h3>Emails Inválidos (devem ser rejeitados)</h3>
+         <p style="color: #666; font-size: 14px; text-align: center; margin-bottom: 15px;">
+           Todos os emails inválidos agora retornam a mensagem simples: "Digite um E-mail válido"
+         </p>
+         <div id="emails-invalidos"></div>
+        </div>
+        
+    <div class="teste-container">
+        <h3>Teste Manual</h3>
+        <input type="email" id="email-teste" placeholder="Digite um email para testar" style="width: 300px; padding: 8px; margin-right: 10px;">
+        <button onclick="testarEmailManual()">Testar</button>
+        <div id="resultado-manual" style="margin-top: 10px;"></div>
+      </div>
+  
+  <script src="script.js"></script>
+  <script>
+        // Emails válidos para teste
+        const emailsValidos = [
+            "usuario@dominio.com",
+            "teste@empresa.com.br",
+            "nome.sobrenome@site.com",
+            "user123@dominio.com.br",
+            "contato@royalbroker.com"
+        ];
+        
+        // Emails inválidos para teste (incluindo os mencionados no bug)
+        const emailsInvalidos = [
+            "mm",
+            "bbb",
+            "kadujbsb",
+            "teste",
+            "usuario@",
+            "@dominio.com",
+            "usuario@dominio",
+            "usuario@dominio.org",
+            "usuario@dominio.net",
+            "usuario@dominio.com.extra",
+            "usuario@dominio.com.br.extra",
+            "usuario@dominio.com.br.com",
+            "usuario@dominio.com.br.br"
+        ];
+        
+        function testarEmail(email) {
+      const validacao = validarEmail(email);
+            return {
+                email: email,
+                valido: validacao.valido,
+                mensagem: validacao.mensagem
+            };
+        }
+        
+        function criarItemTeste(resultado) {
+            const div = document.createElement('div');
+            div.className = `teste-item ${resultado.valido ? 'teste-valido' : 'teste-invalido'}`;
+            
+            div.innerHTML = `
+                <div class="email-teste">${resultado.email}</div>
+                <div class="resultado ${resultado.valido ? 'resultado-valido' : 'resultado-invalido'}">
+                    ${resultado.valido ? '✅ VÁLIDO' : '❌ INVÁLIDO'}: ${resultado.mensagem}
+                </div>
+            `;
+            
+            return div;
+        }
+        
+        function executarTestes() {
+            const containerValidos = document.getElementById('emails-validos');
+            const containerInvalidos = document.getElementById('emails-invalidos');
+            
+            // Limpar containers
+            containerValidos.innerHTML = '';
+            containerInvalidos.innerHTML = '';
+            
+            // Testar emails válidos
+            emailsValidos.forEach(email => {
+                const resultado = testarEmail(email);
+                containerValidos.appendChild(criarItemTeste(resultado));
+            });
+            
+            // Testar emails inválidos
+            emailsInvalidos.forEach(email => {
+                const resultado = testarEmail(email);
+                containerInvalidos.appendChild(criarItemTeste(resultado));
+            });
+        }
+        
+        function testarEmailManual() {
+            const email = document.getElementById('email-teste').value.trim();
+            const resultado = testarEmail(email);
+            const container = document.getElementById('resultado-manual');
+            
+            container.innerHTML = `
+                <div class="teste-item ${resultado.valido ? 'teste-valido' : 'teste-invalido'}">
+                    <div class="email-teste">${email}</div>
+                    <div class="resultado ${resultado.valido ? 'resultado-valido' : 'resultado-invalido'}">
+                        ${resultado.valido ? '✅ VÁLIDO' : '❌ INVÁLIDO'}: ${resultado.mensagem}
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Executar testes quando a página carregar
+        window.addEventListener('load', executarTestes);
+        
+        // Permitir testar com Enter
+        document.getElementById('email-teste').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                testarEmailManual();
+            }
+        });
+  </script>
+</body>
+</html>
+

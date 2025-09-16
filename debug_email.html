@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - Validação de Email</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .debug-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .campo-teste {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        .error {
+            color: #ff6b6b;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        .error.show {
+            display: block;
+        }
+        .debug-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 15px;
+            border: 1px solid #dee2e6;
+        }
+        .teste-botao {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        .teste-botao:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug - Validação de Email</h1>
+    
+    <div class="debug-container">
+        <h3>📧 Teste de Validação</h3>
+        
+        <div class="campo-teste">
+            <label>E-mail</label>
+            <input type="email" id="mcEmail" placeholder="Digite seu e-mail" 
+                   oninput="validarCampoMinhaConta('mcEmail', this.value)" 
+                   onblur="validarCampoMinhaConta('mcEmail', this.value)">
+            <div id="mcEmailError" class="error"></div>
+        </div>
+        
+        <div class="debug-info" id="debugInfo">
+            <strong>Debug Info:</strong><br>
+            Aguardando digitação...
+        </div>
+        
+        <div style="margin-top: 15px;">
+            <button class="teste-botao" onclick="testarEmail('mm')">Testar: mm</button>
+            <button class="teste-botao" onclick="testarEmail('bbb')">Testar: bbb</button>
+            <button class="teste-botao" onclick="testarEmail('kadujbsb')">Testar: kadujbsb</button>
+            <button class="teste-botao" onclick="testarEmail('usuario@dominio.com')">Testar: usuario@dominio.com</button>
+            <button class="teste-botao" onclick="testarEmail('usuario@dominio.org')">Testar: usuario@dominio.org</button>
+        </div>
+    </div>
+    
+    <div class="debug-container">
+        <h3>🧪 Teste Direto da Função</h3>
+        <button class="teste-botao" onclick="testarFuncaoDireta()">Testar Função validarEmail Diretamente</button>
+        <div id="resultado-direto" style="margin-top: 15px;"></div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        function testarEmail(email) {
+            document.getElementById('mcEmail').value = email;
+            validarCampoMinhaConta('mcEmail', email);
+            atualizarDebug();
+        }
+        
+        function testarFuncaoDireta() {
+            const resultadoDiv = document.getElementById('resultado-direto');
+            resultadoDiv.innerHTML = '';
+            
+            const testes = [
+                'mm', 'bbb', 'kadujbsb', 'usuario@dominio.com', 'usuario@dominio.org'
+            ];
+            
+            testes.forEach(email => {
+                const resultado = validarEmail(email);
+                const div = document.createElement('div');
+                div.style.padding = '10px';
+                div.style.margin = '5px 0';
+                div.style.borderRadius = '4px';
+                div.style.backgroundColor = resultado.valido ? '#d4edda' : '#f8d7da';
+                div.style.border = `1px solid ${resultado.valido ? '#c3e6cb' : '#f5c6cb'}`;
+                div.style.color = resultado.valido ? '#155724' : '#721c24';
+                
+                div.innerHTML = `
+                    <strong>Email:</strong> ${email}<br>
+                    <strong>Válido:</strong> ${resultado.valido ? '✅ Sim' : '❌ Não'}<br>
+                    <strong>Mensagem:</strong> ${resultado.mensagem || 'N/A'}
+                `;
+                
+                resultadoDiv.appendChild(div);
+            });
+        }
+        
+        function atualizarDebug() {
+            const debugInfo = document.getElementById('debugInfo');
+            const email = document.getElementById('mcEmail').value;
+            const errorDiv = document.getElementById('mcEmailError');
+            
+            if (!email) {
+                debugInfo.innerHTML = '<strong>Debug Info:</strong><br>Aguardando digitação...';
+                return;
+            }
+            
+            const validacao = validarEmail(email);
+            const temClasseShow = errorDiv.classList.contains('show');
+            const displayStyle = window.getComputedStyle(errorDiv).display;
+            const temTexto = errorDiv.textContent.trim() !== '';
+            
+            debugInfo.innerHTML = `
+                <strong>Debug Info:</strong><br>
+                Email: "${email}"<br>
+                Válido: ${validacao.valido ? '✅ Sim' : '❌ Não'}<br>
+                Mensagem da função: "${validacao.mensagem}"<br>
+                Classe 'show': ${temClasseShow ? '✅ Sim' : '❌ Não'}<br>
+                Display CSS: ${displayStyle}<br>
+                Tem texto: ${temTexto ? '✅ Sim' : '❌ Não'}<br>
+                Texto da div: "${errorDiv.textContent}"<br>
+                <br>
+                <strong>Estado da div de erro:</strong><br>
+                - ID: ${errorDiv.id}<br>
+                - Classes: ${errorDiv.className}<br>
+                - Style display: ${errorDiv.style.display}<br>
+                - Computed display: ${displayStyle}
+            `;
+        }
+        
+        // Atualizar debug em tempo real
+        document.getElementById('mcEmail').addEventListener('input', function() {
+            setTimeout(atualizarDebug, 100); // Pequeno delay para garantir que a validação foi executada
+        });
+        
+        // Atualizar debug também no blur
+        document.getElementById('mcEmail').addEventListener('blur', function() {
+            setTimeout(atualizarDebug, 100);
+        });
+        
+        // Teste inicial
+        console.log('=== DEBUG VALIDAÇÃO EMAIL ===');
+        console.log('✅ Função validarEmail:', typeof validarEmail);
+        console.log('✅ Função validarCampoMinhaConta:', typeof validarCampoMinhaConta);
+        
+        // Teste rápido da função validarEmail
+        console.log('🧪 Teste rápido validarEmail:');
+        console.log('  mm:', validarEmail('mm'));
+        console.log('  usuario@dominio.com:', validarEmail('usuario@dominio.com'));
+    </script>
+</body>
+</html>

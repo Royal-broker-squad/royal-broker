@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Validação Email - Bug</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .teste { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .erro { background-color: #ffebee; border-color: #f44336; }
+        .sucesso { background-color: #e8f5e8; border-color: #4caf50; }
+        .resultado { margin-top: 5px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Teste de Validação de Email - Bug Reportado</h1>
+    
+    <div id="resultados"></div>
+
+    <script>
+        // Função de validação CORRIGIDA (copiada do script.js atualizado)
+        function validarEmail(email) {
+            console.log(`🧪 Validando email: "${email}"`);
+            
+            // Verifica se está vazio
+            if (!email || email.trim() === '') {
+                console.log(`❌ Email vazio ou apenas espaços`);
+                return { valido: false, mensagem: "Digite um E-mail válido" };
+            }
+            
+            // Regex mais rigoroso para validação de email
+            // Aceita apenas: nome@dominio.com ou nome@dominio.com.br (sem caracteres extras)
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|com\.br)$/;
+            
+            // Verifica se o email termina exatamente no padrão esperado
+            if (!emailRegex.test(email)) {
+                console.log(`❌ Email não passou no regex: ${email}`);
+                return { valido: false, mensagem: "Digite um E-mail válido" };
+            }
+            
+            // Verifica se há caracteres extras após o domínio
+            const partes = email.split('@');
+            if (partes.length !== 2) {
+                console.log(`❌ Email não tem exatamente um @`);
+                return { valido: false, mensagem: "Digite um E-mail válido" };
+            }
+            
+            const dominio = partes[1];
+            if (dominio.length < 3 || !dominio.includes('.')) {
+                console.log(`❌ Domínio inválido: ${dominio}`);
+                return { valido: false, mensagem: "Digite um E-mail válido" };
+            }
+            
+            // Verifica se não há caracteres extras após o domínio
+            const dominioPartes = dominio.split('.');
+            if (dominioPartes.length < 2) {
+                console.log(`❌ Domínio sem extensão`);
+                return { valido: false, mensagem: "Digite um E-mail válido" };
+            }
+            
+            // Verifica se a extensão é exatamente .com ou .com.br
+            const extensao = dominioPartes.slice(-2).join('.');
+            if (extensao !== 'com' && extensao !== 'com.br') {
+                console.log(`❌ Extensão inválida: ${extensao}`);
+                return { valido: false, mensagem: "Digite um E-mail válido" };
+            }
+            
+            // Verifica se não há caracteres extras após a extensão
+            if (dominioPartes.length > 2 && extensao === 'com') {
+                console.log(`❌ Caracteres extras após extensão .com`);
+                return { valido: false, mensagem: "Digite um E-mail válido" };
+            }
+            
+            // NOVA VALIDAÇÃO: Verifica se há caracteres extras após o final do email
+            // Remove espaços em branco e verifica se o email termina exatamente no domínio
+            const emailLimpo = email.trim();
+            const emailSemExtras = emailLimpo.replace(/\.(com|com\.br)$/, '');
+            const dominioEsperado = emailLimpo.substring(emailLimpo.lastIndexOf('@') + 1);
+            
+            // Verifica se o domínio termina exatamente com .com ou .com.br
+            if (!dominioEsperado.endsWith('.com') && !dominioEsperado.endsWith('.com.br')) {
+                console.log(`❌ Domínio não termina com .com ou .com.br: ${dominioEsperado}`);
+                return { valido: false, mensagem: "Digite um E-mail válido" };
+            }
+            
+            // Verifica se há caracteres extras após a extensão final
+            const ultimoPonto = emailLimpo.lastIndexOf('.');
+            const extensaoFinal = emailLimpo.substring(ultimoPonto);
+            
+            if (extensaoFinal !== '.com' && extensaoFinal !== '.com.br') {
+                console.log(`❌ Caracteres extras após extensão: ${extensaoFinal}`);
+                return { valido: false, mensagem: "Digite um E-mail válido" };
+            }
+            
+            // Verifica se o email não tem caracteres extras após a extensão final
+            const posicaoExtensao = emailLimpo.lastIndexOf(extensaoFinal);
+            if (posicaoExtensao + extensaoFinal.length !== emailLimpo.length) {
+                console.log(`❌ Caracteres extras após a extensão final`);
+                return { valido: false, mensagem: "Digite um E-mail válido" };
+            }
+            
+            console.log(`✅ Email válido: ${email}`);
+            return { valido: true, mensagem: "" };
+        }
+
+        // Emails para testar
+        const emailsTeste = [
+            'saraanadao16@gmail.comjdbcijwb', // Bug reportado
+            'saraanadao16@gmail.com', // Válido
+            'saraanadao16@gmail.com.br', // Válido
+            'teste@hotmail.comjjj', // Sequência repetida
+            'teste@hotmail.comkkk', // Sequência repetida
+            'teste@hotmail.comlll', // Sequência repetida
+            'teste@hotmail.comqjwbgdqw', // Aleatório
+            'teste@hotmail.com123', // Números
+            'teste@hotmail.comabc', // Letras
+            'teste@hotmail.com.br', // Válido
+            'teste@hotmail.com.brxyz', // Extras após .br
+        ];
+
+        function executarTestes() {
+            const container = document.getElementById('resultados');
+            
+            emailsTeste.forEach(email => {
+                const resultado = validarEmail(email);
+                const div = document.createElement('div');
+                div.className = `teste ${resultado.valido ? 'sucesso' : 'erro'}`;
+                
+                div.innerHTML = `
+                    <strong>Email:</strong> ${email}<br>
+                    <div class="resultado ${resultado.valido ? 'sucesso' : 'erro'}">
+                        ${resultado.valido ? '✅ VÁLIDO' : '❌ INVÁLIDO'}: ${resultado.mensagem}
+                    </div>
+                `;
+                
+                container.appendChild(div);
+            });
+        }
+
+        // Executar testes quando a página carregar
+        window.onload = executarTestes;
+    </script>
+</body>
+</html>

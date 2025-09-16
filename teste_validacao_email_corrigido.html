@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Validação de Email Corrigido</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        .test-case {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .valid {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .invalid {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        .result {
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        .pass {
+            color: green;
+        }
+        .fail {
+            color: red;
+        }
+        input {
+            padding: 8px;
+            width: 300px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #testResults {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Teste de Validação de Email Corrigido</h1>
+    
+    <div>
+        <h2>Teste Manual</h2>
+        <input type="email" id="emailTest" placeholder="Digite um email para testar">
+        <button onclick="testarEmail()">Testar</button>
+        <div id="resultadoManual" class="result"></div>
+    </div>
+    
+    <h2>Testes Automáticos</h2>
+    <button onclick="executarTestes()">Executar Todos os Testes</button>
+    
+    <div id="testResults"></div>
+    
+    <script src="script.js"></script>
+    <script>
+        // Função para testar email manualmente
+        function testarEmail() {
+            const email = document.getElementById('emailTest').value;
+            const resultado = validarEmail(email);
+            const resultadoDiv = document.getElementById('resultadoManual');
+            
+            if (resultado.valido) {
+                resultadoDiv.textContent = '✅ Email válido';
+                resultadoDiv.className = 'result pass';
+            } else {
+                resultadoDiv.textContent = '❌ ' + resultado.mensagem;
+                resultadoDiv.className = 'result fail';
+            }
+        }
+        
+        // Função para executar testes automáticos
+        function executarTestes() {
+            const testCases = [
+                // Casos válidos
+                { email: 'usuario@dominio.com', esperado: true, descricao: 'Email básico com .com' },
+                { email: 'usuario@dominio.com.br', esperado: true, descricao: 'Email com .com.br' },
+                { email: 'usuario.nome@dominio.com', esperado: true, descricao: 'Email com ponto no nome' },
+                { email: 'usuario-nome@dominio.com', esperado: true, descricao: 'Email com hífen no nome' },
+                { email: 'usuario_nome@dominio.com', esperado: true, descricao: 'Email com underscore no nome' },
+                { email: 'usuario123@dominio.com', esperado: true, descricao: 'Email com números no nome' },
+                
+                // Casos inválidos
+                { email: 'usuario@dominio.comextra', esperado: false, descricao: 'Email com caracteres extras após .com' },
+                { email: 'usuario@dominio.com.brextra', esperado: false, descricao: 'Email com caracteres extras após .com.br' },
+                { email: 'usuario@dominio.combbb', esperado: false, descricao: 'Email com caracteres extras após .com (bbb)' },
+                { email: 'usuario@dominio.comsbdbwsh', esperado: false, descricao: 'Email com caracteres extras após .com (sbdbwsh)' },
+                { email: 'usuario@dominio.net', esperado: false, descricao: 'Email com extensão diferente (.net)' },
+                { email: 'usuario@dominio.org', esperado: false, descricao: 'Email com extensão diferente (.org)' },
+                { email: 'usuario@dominio', esperado: false, descricao: 'Email sem extensão' },
+                { email: 'usuario@.com', esperado: false, descricao: 'Email sem domínio' },
+                { email: 'usuario@dominio.', esperado: false, descricao: 'Email com ponto no final sem extensão' },
+                { email: 'usuario@dominio..com', esperado: false, descricao: 'Email com pontos duplicados' },
+                { email: 'usuario@dominio.c', esperado: false, descricao: 'Email com extensão incompleta' },
+                { email: 'usuario@dominio.comm', esperado: false, descricao: 'Email com extensão inválida (.comm)' },
+                { email: 'usuario@dominio.co', esperado: false, descricao: 'Email com extensão inválida (.co)' },
+                { email: 'usuario@dominio.com.', esperado: false, descricao: 'Email com ponto no final' },
+                { email: '@dominio.com', esperado: false, descricao: 'Email sem nome de usuário' },
+                { email: 'usuario@', esperado: false, descricao: 'Email sem domínio' },
+                { email: 'usuario', esperado: false, descricao: 'Email sem @ e domínio' },
+                { email: 'usuario@@dominio.com', esperado: false, descricao: 'Email com @ duplicado' },
+                { email: ' ', esperado: false, descricao: 'Email com apenas espaço' },
+                { email: '', esperado: false, descricao: 'Email vazio' }
+            ];
+            
+            const resultsDiv = document.getElementById('testResults');
+            resultsDiv.innerHTML = '';
+            
+            let passCount = 0;
+            let failCount = 0;
+            
+            testCases.forEach((testCase, index) => {
+                const resultado = validarEmail(testCase.email);
+                const passou = resultado.valido === testCase.esperado;
+                
+                if (passou) passCount++;
+                else failCount++;
+                
+                const testDiv = document.createElement('div');
+                testDiv.className = 'test-case ' + (passou ? 'valid' : 'invalid');
+                
+                testDiv.innerHTML = `
+                    <strong>Teste ${index + 1}:</strong> ${testCase.descricao}<br>
+                    <code>${testCase.email}</code><br>
+                    Esperado: ${testCase.esperado ? 'Válido' : 'Inválido'}, 
+                    Resultado: ${resultado.valido ? 'Válido' : 'Inválido'}<br>
+                    <span class="result ${passou ? 'pass' : 'fail'}">
+                        ${passou ? '✅ PASSOU' : '❌ FALHOU'}
+                    </span>
+                `;
+                
+                resultsDiv.appendChild(testDiv);
+            });
+            
+            const summaryDiv = document.createElement('div');
+            summaryDiv.innerHTML = `
+                <h3>Resumo dos Testes</h3>
+                <p>Total de testes: ${testCases.length}</p>
+                <p class="pass">Testes passados: ${passCount}</p>
+                <p class="fail">Testes falhos: ${failCount}</p>
+            `;
+            
+            resultsDiv.insertBefore(summaryDiv, resultsDiv.firstChild);
+        }
+        
+        // Executar testes automaticamente ao carregar a página
+        window.onload = function() {
+            executarTestes();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Final - Validação Email (Minha Conta)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .modal {
+            background: #0b1320;
+            border: 1px solid #203447;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #e7f6ff;
+        }
+        .modal-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #203447;
+            padding-bottom: 10px;
+        }
+        .modal-title {
+            color: #2e78ff;
+            margin: 0;
+        }
+        .modal-x {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+        }
+        .campo {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #97c0de;
+            font-weight: 600;
+        }
+        .field-with-edit {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        input {
+            flex: 1;
+            padding: 10px;
+            background: #0f1821;
+            border: 1px solid #203447;
+            border-radius: 4px;
+            color: #e7f6ff;
+            font-size: 14px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #2e78ff;
+        }
+        .edit-btn {
+            background: #ff6b35;
+            border: none;
+            color: white;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .error {
+            color: #ff6b6b;
+            font-size: 12px;
+            margin-top: 4px;
+            font-weight: 600;
+            display: none;
+        }
+        .error.show {
+            display: block;
+        }
+        .btn-royal {
+            background: #2e78ff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+        .btn-royal:hover {
+            background: #1f5dff;
+        }
+        .status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .status.sucesso {
+            background-color: #155724;
+            color: #d4edda;
+            border: 1px solid #c3e6cb;
+        }
+        .status.erro {
+            background-color: #721c24;
+            color: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+        .log {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 20px;
+            border: 1px solid #333;
+            max-height: 300px;
+            overflow-y: auto;
+            color: #e0e0e0;
+        }
+        .teste-botoes {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .teste-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .teste-btn:hover {
+            background: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Teste Final - Validação Email (Minha Conta)</h1>
+    
+    <div class="modal">
+        <div class="modal-head">
+            <h3 class="modal-title">Minha conta</h3>
+            <button class="modal-x">×</button>
+        </div>
+        
+        <div class="modal-body">
+            <form onsubmit="event.preventDefault(); salvarMinhaConta();">
+                <div class="campo">
+                    <label>Nome completo</label>
+                    <div class="field-with-edit">
+                        <input type="text" id="mcNome" placeholder="Seu nome" value="Sara Anadão Nogueira" readonly>
+                        <button type="button" class="edit-btn" onclick="editarCampo('mcNome')" title="Editar nome">✏️</button>
+                    </div>
+                    <div id="mcNomeError" class="error"></div>
+                </div>
+                
+                <div class="campo">
+                    <label>E-mail</label>
+                    <div class="field-with-edit">
+                        <input type="email" id="mcEmail" placeholder="Seu e-mail" value="saraanadao16@gmail.com" readonly
+                               oninput="validarCampoMinhaConta('mcEmail', this.value)" 
+                               onblur="validarCampoMinhaConta('mcEmail', this.value)">
+                        <button type="button" class="edit-btn" onclick="editarCampo('mcEmail')" title="Editar e-mail">✏️</button>
+                    </div>
+                    <div id="mcEmailError" class="error"></div>
+                </div>
+                
+                <div class="campo">
+                    <label>WhatsApp</label>
+                    <div class="field-with-edit">
+                        <input type="text" id="mcZap" placeholder="Seu celular (DDD)" value="(11) 97789-0827" readonly>
+                        <button type="button" class="edit-btn" onclick="editarCampo('mcZap')" title="Editar WhatsApp">✏️</button>
+                    </div>
+                    <div id="mcZapError" class="error"></div>
+                </div>
+                
+                <button class="btn-royal" type="submit" id="btnSalvarConta" style="display: none;">Salvar Alterações</button>
+                <div id="contaMsg" class="status"></div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="teste-botoes">
+        <button class="teste-btn" onclick="testarEmail('mm')">Testar: mm</button>
+        <button class="teste-btn" onclick="testarEmail('bbb')">Testar: bbb</button>
+        <button class="teste-btn" onclick="testarEmail('kadujbsb')">Testar: kadujbsb</button>
+        <button class="teste-btn" onclick="testarEmail('usuario@dominio.org')">Testar: usuario@dominio.org</button>
+        <button class="teste-btn" onclick="testarEmail('usuario@dominio.com')">Testar: usuario@dominio.com</button>
+        <button class="teste-btn" onclick="testarEmail('teste@empresa.com.br')">Testar: teste@empresa.com.br</button>
+        <button class="teste-btn" onclick="limparLog()">Limpar Log</button>
+    </div>
+    
+    <div class="log" id="log">
+        <strong>Log de eventos:</strong><br>
+        Aguardando ações...
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        function adicionarLog(mensagem) {
+            const log = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            log.innerHTML += `<br>[${timestamp}] ${mensagem}`;
+            log.scrollTop = log.scrollHeight;
+        }
+        
+        function limparLog() {
+            document.getElementById('log').innerHTML = '<strong>Log de eventos:</strong><br>';
+        }
+        
+        function testarEmail(email) {
+            adicionarLog(`🧪 Testando email: ${email}`);
+            document.getElementById('mcEmail').value = email;
+            validarCampoMinhaConta('mcEmail', email);
+            atualizarStatus();
+        }
+        
+        function atualizarStatus() {
+            const email = document.getElementById('mcEmail').value;
+            const status = document.getElementById('status');
+            const errorDiv = document.getElementById('mcEmailError');
+            
+            if (!email) {
+                status.textContent = '';
+                status.className = 'status';
+                return;
+            }
+            
+            const validacao = validarEmail(email);
+            const temClasseShow = errorDiv.classList.contains('show');
+            const displayStyle = window.getComputedStyle(errorDiv).display;
+            
+            if (validacao.valido) {
+                status.textContent = '✅ Email válido - Mensagem de erro deve estar oculta';
+                status.className = 'status sucesso';
+            } else {
+                status.textContent = '❌ Email inválido - Mensagem de erro deve estar visível';
+                status.className = 'status erro';
+            }
+            
+            adicionarLog(`📊 Status: válido=${validacao.valido}, classe_show=${temClasseShow}, display=${displayStyle}`);
+        }
+        
+        function salvarMinhaConta() {
+            const email = document.getElementById('mcEmail').value;
+            const validacao = validarEmail(email);
+            
+            if (validacao.valido) {
+                adicionarLog('✅ Salvando dados - Email válido');
+                document.getElementById('contaMsg').textContent = 'Dados atualizados com sucesso!';
+                document.getElementById('contaMsg').className = 'status sucesso';
+            } else {
+                adicionarLog('❌ Não é possível salvar - Email inválido');
+                document.getElementById('contaMsg').textContent = 'Corrija os erros antes de salvar.';
+                document.getElementById('contaMsg').className = 'status erro';
+            }
+        }
+        
+        // Event listeners para o campo de email
+        document.getElementById('mcEmail').addEventListener('input', function() {
+            adicionarLog(`⌨️ Input event: "${this.value}"`);
+            validarCampoMinhaConta('mcEmail', this.value);
+            setTimeout(atualizarStatus, 100);
+        });
+        
+        document.getElementById('mcEmail').addEventListener('blur', function() {
+            adicionarLog(`👁️ Blur event: "${this.value}"`);
+            validarCampoMinhaConta('mcEmail', this.value);
+            setTimeout(atualizarStatus, 100);
+        });
+        
+        // Inicialização
+        adicionarLog('🚀 Página carregada - Sistema de validação ativo');
+        adicionarLog('💡 Use os botões de teste ou edite o campo de email');
+        adicionarLog('🎯 Comportamento esperado:');
+        adicionarLog('  - Emails inválidos devem mostrar "Digite um E-mail válido"');
+        adicionarLog('  - Emails válidos devem ocultar a mensagem de erro');
+        adicionarLog('  - Deve permitir salvar apenas com email válido');
+    </script>
+</body>
+</html>

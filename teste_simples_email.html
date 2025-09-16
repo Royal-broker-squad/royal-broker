@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Simples - Validação Email</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .campo {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .error {
+            color: #ff6b6b;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        .error.show {
+            display: block;
+        }
+        .status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .status.sucesso {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.erro {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .log {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 15px;
+            border: 1px solid #dee2e6;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Teste Simples - Validação Email</h1>
+    
+    <div class="container">
+        <div class="campo">
+            <label>E-mail:</label>
+            <input type="email" id="emailInput" placeholder="Digite um email para testar">
+            <div id="emailError" class="error"></div>
+        </div>
+        
+        <div class="status" id="status"></div>
+        
+        <div class="log" id="log">
+            <strong>Log de eventos:</strong><br>
+            Aguardando digitação...
+        </div>
+        
+        <div style="margin-top: 20px;">
+            <button onclick="testarEmail('mm')" style="padding: 8px 16px; margin: 5px;">Testar: mm</button>
+            <button onclick="testarEmail('bbb')" style="padding: 8px 16px; margin: 5px;">Testar: bbb</button>
+            <button onclick="testarEmail('usuario@dominio.com')" style="padding: 8px 16px; margin: 5px;">Testar: usuario@dominio.com</button>
+            <button onclick="limparLog()" style="padding: 8px 16px; margin: 5px; background: #6c757d; color: white; border: none; border-radius: 4px;">Limpar Log</button>
+        </div>
+    </div>
+
+    <script>
+        function adicionarLog(mensagem) {
+            const log = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            log.innerHTML += `<br>[${timestamp}] ${mensagem}`;
+            log.scrollTop = log.scrollHeight;
+        }
+        
+        function limparLog() {
+            document.getElementById('log').innerHTML = '<strong>Log de eventos:</strong><br>';
+        }
+        
+        function validarEmail(email) {
+            adicionarLog(`🧪 Validando email: "${email}"`);
+            
+            // Verifica se está vazio
+            if (!email || email.trim() === '') {
+                adicionarLog(`❌ Email vazio ou apenas espaços`);
+                return { valido: false, mensagem: "Digite um E-mail válido" };
+            }
+            
+            // Regex mais rigoroso para validação de email
+            // Aceita apenas: nome@dominio.com ou nome@dominio.com.br
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|com\.br)$/;
+            
+            // Verifica se o email termina exatamente no padrão esperado
+            if (!emailRegex.test(email)) {
+                adicionarLog(`❌ Email não passou no regex: ${email}`);
+                return { valido: false, mensagem: "Digite um E-mail válido" };
+            }
+            
+            // Verifica se há caracteres extras após o domínio
+            const partes = email.split('@');
+            if (partes.length !== 2) {
+                adicionarLog(`❌ Email não tem exatamente um @`);
+                return { valido: false, mensagem: "Digite um E-mail válido" };
+            }
+            
+            const dominio = partes[1];
+            if (dominio.length < 3 || !dominio.includes('.')) {
+                adicionarLog(`❌ Domínio inválido: ${dominio}`);
+                return { valido: false, mensagem: "Digite um E-mail válido" };
+            }
+            
+            // Verifica se não há caracteres extras após o domínio
+            const dominioPartes = dominio.split('.');
+            if (dominioPartes.length < 2) {
+                adicionarLog(`❌ Domínio sem extensão`);
+                return { valido: false, mensagem: "Digite um E-mail válido" };
+            }
+            
+            // Verifica se a extensão é exatamente .com ou .com.br
+            const extensao = dominioPartes.slice(-2).join('.');
+            if (extensao !== 'com' && extensao !== 'com.br') {
+                adicionarLog(`❌ Extensão inválida: ${extensao}`);
+                return { valido: false, mensagem: "Digite um E-mail válido" };
+            }
+            
+            // Verifica se não há caracteres extras após a extensão
+            if (dominioPartes.length > 2 && extensao === 'com') {
+                adicionarLog(`❌ Caracteres extras após extensão .com`);
+                return { valido: false, mensagem: "Digite um E-mail válido" };
+            }
+            
+            adicionarLog(`✅ Email válido: ${email}`);
+            return { valido: true, mensagem: "" };
+        }
+        
+        function validarCampoMinhaConta(campoId, valor) {
+            adicionarLog(`🔍 validarCampoMinhaConta chamada para ${campoId} com valor: "${valor}"`);
+            
+            const errorDiv = document.getElementById(campoId + 'Error');
+            let valido = true;
+            let mensagem = '';
+            
+            if (campoId === 'mcEmail') {
+                const validacaoEmail = validarEmail(valor);
+                valido = validacaoEmail.valido;
+                mensagem = validacaoEmail.mensagem;
+            }
+            
+            adicionarLog(`📊 Resultado: válido=${valido}, mensagem="${mensagem}"`);
+            
+            if (errorDiv) {
+                if (!valido && valor.trim()) {
+                    // Mostra mensagem de erro
+                    errorDiv.textContent = mensagem;
+                    errorDiv.classList.add('show');
+                    adicionarLog(`🔴 Mostrando erro: ${mensagem}`);
+                } else {
+                    // Esconde a mensagem de erro quando o campo é válido OU está vazio
+                    errorDiv.classList.remove('show');
+                    errorDiv.textContent = '';
+                    adicionarLog(`✅ Ocultando erro - Campo válido ou vazio`);
+                }
+            } else {
+                adicionarLog(`❌ Elemento de erro não encontrado: ${campoId}Error`);
+            }
+            
+            return valido;
+        }
+        
+        function testarEmail(email) {
+            adicionarLog(`🧪 Testando email: ${email}`);
+            document.getElementById('emailInput').value = email;
+            validarCampoMinhaConta('mcEmail', email);
+            atualizarStatus();
+        }
+        
+        function atualizarStatus() {
+            const email = document.getElementById('emailInput').value;
+            const status = document.getElementById('status');
+            const errorDiv = document.getElementById('emailError');
+            
+            if (!email) {
+                status.textContent = '';
+                status.className = 'status';
+                return;
+            }
+            
+            const validacao = validarEmail(email);
+            const temClasseShow = errorDiv.classList.contains('show');
+            const displayStyle = window.getComputedStyle(errorDiv).display;
+            
+            if (validacao.valido) {
+                status.textContent = '✅ Email válido - Mensagem de erro deve estar oculta';
+                status.className = 'status sucesso';
+            } else {
+                status.textContent = '❌ Email inválido - Mensagem de erro deve estar visível';
+                status.className = 'status erro';
+            }
+            
+            adicionarLog(`📊 Status atualizado: válido=${validacao.valido}, classe_show=${temClasseShow}, display=${displayStyle}`);
+        }
+        
+        // Event listeners
+        document.getElementById('emailInput').addEventListener('input', function() {
+            adicionarLog(`⌨️ Input event: "${this.value}"`);
+            validarCampoMinhaConta('mcEmail', this.value);
+            setTimeout(atualizarStatus, 100);
+        });
+        
+        document.getElementById('emailInput').addEventListener('blur', function() {
+            adicionarLog(`👁️ Blur event: "${this.value}"`);
+            validarCampoMinhaConta('mcEmail', this.value);
+            setTimeout(atualizarStatus, 100);
+        });
+        
+        // Inicialização
+        adicionarLog('🚀 Página carregada - Sistema de validação ativo');
+        adicionarLog('💡 Digite um email ou use os botões de teste');
+    </script>
+</body>
+</html>

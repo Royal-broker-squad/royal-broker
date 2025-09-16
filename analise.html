@@ -45,19 +45,45 @@
     <canvas id="kChart" width="900" height="380" class="rt-canvas" aria-label="Gráfico"></canvas>
     <div class="hint">Passe o mouse para ver data/hora, abertura, máxima, mínima e fechamento.</div>
 
-    <div class="mini-wallet panel panel-royal-outline">
-      <h3 class="panel-title">Minha carteira</h3>
-      <table id="miniWallet" class="rb-table">
-        <thead><tr><th>Logo</th><th>Ativo</th><th>Qtd</th><th>Preço Médio</th></tr></thead>
-        <tbody></tbody>
-      </table>
+    <div class="analise-tools panel panel-royal-outline">
+      <h3 class="panel-title">Ferramentas de Análise</h3>
+      <div class="tools-grid">
+        <div class="tool-card">
+          <div class="tool-icon">📊</div>
+          <h4>Indicadores Técnicos</h4>
+          <p>RSI, MACD, Médias Móveis e mais</p>
+          <button class="btn-royal small" onclick="abrirIndicadores()">Ver Indicadores</button>
+        </div>
+        <div class="tool-card">
+          <div class="tool-icon">🎯</div>
+          <h4>Níveis de Suporte/Resistência</h4>
+          <p>Identificação automática de níveis importantes</p>
+          <button class="btn-royal small" onclick="abrirNiveis()">Ver Níveis</button>
+        </div>
+        <div class="tool-card">
+          <div class="tool-icon">📈</div>
+          <h4>Padrões de Candlestick</h4>
+          <p>Reconhecimento de padrões de reversão</p>
+          <button class="btn-royal small" onclick="abrirPadroes()">Ver Padrões</button>
+        </div>
+      </div>
+      
+      <!-- MINI CARTEIRA -->
+      <div class="mini-carteira">
+        <h4>📊 Minha Carteira</h4>
+        <div id="miniCarteiraList" class="mini-carteira-list"></div>
+      </div>
+      
       <div class="ana-actions">
-        <button class="btn-buy" id="btnBuy">Comprar</button>
-        <button class="btn-sell" id="btnSell">Vender</button>
+        <button class="btn-royal small" onclick="abrirAlertaPreco()">🔔 Alertas de Preço</button>
+        <button class="btn-turq small" onclick="abrirHistoricoOperacoes()">📊 Histórico</button>
       </div>
     </div>
   </div>
 
+
+
   <script src="analise.js"></script>
+
 </body>
 </html>
